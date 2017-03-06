@@ -1,9 +1,10 @@
-import { uiManager } from 'uimanager';
+import { Level } from './level';
+import { uiManager } from './uimanager';
 import { UIContainer } from './uicontainer';
-import * as gr from 'graphics';
-import {Mousetrap} from 'mousewrap';
-import { UIBase, MyMouseEvent } from 'uibase';
-import { Rect } from 'utils';
+import * as gr from './graphics';
+import {Mousetrap} from './mousewrap';
+import { UIBase, MyMouseEvent } from './uibase';
+import { Rect } from './utils';
 import { Hud } from "./hud";
 
 export class MenuItem extends UIBase {
@@ -25,6 +26,7 @@ export class MenuItem extends UIBase {
     {
         this.parent.close();
         uiManager.add(new Hud())
+        uiManager.add(new Level())
         console.log("down");
     }
 }
@@ -33,7 +35,6 @@ export class MainMenu extends UIContainer {
     constructor()
     {
         super();
-        this.rect = uiManager.appRect.clone();
         let m : MenuItem = new MenuItem();
         m.rect = new Rect(100, 100, 200, 50);
         this.add(m);

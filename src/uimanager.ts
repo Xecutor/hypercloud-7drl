@@ -3,10 +3,10 @@ import { Rect } from './utils';
 import {UIBase} from 'uibase';
 import {UIContainer} from 'uicontainer';
 import {Pos} from 'utils';
-import { getBoundingRect, getSize, clear } from 'graphics';
+import * as gr from 'graphics';
 
 class UIManager extends UIContainer{
-    appRect : Rect;
+    timerId:number;
     constructor()
     {
         super();
@@ -14,17 +14,21 @@ class UIManager extends UIContainer{
         canvas.onmousedown = (e)=>this.postRawMouseEvent('onMouseDown', e);
         canvas.onmouseup = (e)=>this.postRawMouseEvent('onMouseUp', e);
         canvas.onmousemove = (e)=>this.postRawMouseEvent('onMouseMove', e);
-        this.appRect = new Rect(0, 0, canvas.width, canvas.height);
+        this.timerId=setInterval(()=>this.draw(), 40);
     }
     postRawMouseEvent(name:string, e:MouseEvent)
     {
-        let r = getBoundingRect();
-        let sz = getSize();
+        let r = gr.getBoundingRect();
+        let sz = gr.getAppSize();
         let x = (e.clientX - r.left) * sz.width / r.width;
         let y = (e.clientY - r.top) * sz.height / r.height;
         let d = new MyMouseEvent(x,y,e);
         this.postMouseEvent(name, d);
-        //this.draw();
+    }
+    draw()
+    {
+        gr.clear();
+        super.draw();
     }
 }
 

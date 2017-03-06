@@ -1,6 +1,6 @@
-import { UIContainer } from 'uicontainer';
-import {uiManager} from 'uimanager';
-import {Pos, Size, Rect} from 'utils';
+import { UIContainer } from './uicontainer';
+import { Pos, Size, Rect } from './utils';
+import { getAppRect } from "./graphics";
 
 export class MyMouseEvent {
     x : number;
@@ -15,7 +15,7 @@ export class MyMouseEvent {
 }
 
 export class UIBase {
-    rect:Rect = new Rect;
+    rect:Rect = getAppRect().clone();
     parent:UIContainer;
     draw()
     {
