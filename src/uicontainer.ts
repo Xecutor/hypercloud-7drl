@@ -1,5 +1,5 @@
 import { Pos } from './utils';
-import { UIBase } from 'uibase';
+import { UIBase, MyMouseEvent } from 'uibase';
 
 export class UIContainer extends UIBase {
     objects: Array<UIBase> = new Array<UIBase>();
@@ -12,7 +12,7 @@ export class UIContainer extends UIBase {
     remove(obj: UIBase) {
         this.objects = this.objects.filter((arg) => arg !== obj);
     }
-    postMouseEvent(name: string, e: MouseEvent) {
+    postMouseEvent(name: string, e: MyMouseEvent) {
         let pos = new Pos(e.x, e.y);
         let foundObject: UIBase;
         this.objects.forEach(function (obj) {

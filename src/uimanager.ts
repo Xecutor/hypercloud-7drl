@@ -1,3 +1,4 @@
+import { MyMouseEvent } from './uibase';
 import { Rect } from './utils';
 import {UIBase} from 'uibase';
 import {UIContainer} from 'uicontainer';
@@ -17,14 +18,13 @@ class UIManager extends UIContainer{
     }
     postRawMouseEvent(name:string, e:MouseEvent)
     {
-        let d : any = e;
         let r = getBoundingRect();
         let sz = getSize();
-        d.x = (e.clientX - r.left) * sz.width / r.width;
-        d.y = (e.clientY - r.top) * sz.height / r.height;
-        this.postMouseEvent(name, e);
-        clear();
-        this.draw();
+        let x = (e.clientX - r.left) * sz.width / r.width;
+        let y = (e.clientY - r.top) * sz.height / r.height;
+        let d = new MyMouseEvent(x,y,e);
+        this.postMouseEvent(name, d);
+        //this.draw();
     }
 }
 

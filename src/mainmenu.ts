@@ -2,7 +2,7 @@ import { uiManager } from 'uimanager';
 import { UIContainer } from './uicontainer';
 import * as gr from 'graphics';
 import {Mousetrap} from 'mousewrap';
-import {UIBase} from 'uibase';
+import { UIBase, MyMouseEvent } from 'uibase';
 import { Rect } from 'utils';
 import { Hud } from "./hud";
 
@@ -13,18 +13,18 @@ export class MenuItem extends UIBase {
         gr.fillrect(this.rect, this.color);
         gr.textout(this.rect.pos.x, this.rect.pos.y, "white", "hello")
     }
-    onMouseEnter(e:MouseEvent)
+    onMouseEnter(e:MyMouseEvent)
     {
         this.color='red';
     }
-    onMouseLeave(e:MouseEvent)
+    onMouseLeave(e:MyMouseEvent)
     {
         this.color='green';
     }
-    onMouseDown(e:MouseEvent)
+    onMouseDown(e:MyMouseEvent)
     {
         this.parent.close();
-        this.parent.add(new Hud())
+        uiManager.add(new Hud())
         console.log("down");
     }
 }
