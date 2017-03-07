@@ -36,6 +36,19 @@ export function clear()
     //ctx.clearRect(0,0, canvas.width, canvas.height);
 }
 
+export function setClip(r:Rect)
+{
+    ctx.save();
+    let path :any = new Path2D();
+    path.rect(r.pos.x, r.pos.y, r.size.width, r.size.height);
+    ctx.clip(path);
+}
+
+export function resetClip()
+{
+    ctx.restore();
+}
+
 export function fillrect(r:Rect, clr:string)
 {
     ctx.fillStyle=clr;

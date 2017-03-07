@@ -1,10 +1,12 @@
 import { TileManager } from './tilemanager';
 import { hudWIdth } from './hud';
-import { UIBase } from './uibase';
+import { UIBase, MyMouseEvent } from './uibase';
 import * as gr from './graphics'
 import { Rect, Pos } from "./utils";
 
 export class Level extends UIBase {
+    shift = new Pos();
+    dragStart : Pos = null;
     constructor()
     {
         super();
@@ -13,6 +15,33 @@ export class Level extends UIBase {
     }
     draw()
     {
-        TileManager.instance.drawTile(new Pos(20,20), 'a');
+        const countX = Math.ceil(this.rect.size.width / 32) + 1;
+        const countY = Math.ceil(this.rect.size.height / 32) + 1;
+        gr.setClip(this.rect);
+        for(let x=0;x<countX;++x) {
+            for(let y=0;y<countY;++y) {
+                TileManager.instance.drawTile(new Pos(this.shift.x+x*32, this.shift.y+y*32), 'a');
+            }
+        }
+        gr.resetClip();
+    }
+    onMouseDown(e:MyMouseEvent)
+    {
+        this.dragStart=new Pos(e.x, e.y);
+    }
+    onMouseUp(e:MyMouseEvent)
+    {
+        this.dragStart = null;
+    }
+    onMouseMove(e:MyMouseEvent)
+    {
+        if(this.dragStart)
+        {
+            this.shift.x = (e.x-this.dragStart.x)%32;
+            this.shift.y = (e.y-this.dragStart.y)%32;
+            if(this.shift.x>0)this.shift.x-=32;
+            if(this.shift.y>0)this.shift.y-=32;
+            console.log(this.shift);
+        }
     }
 }
