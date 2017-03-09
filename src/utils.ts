@@ -2,13 +2,32 @@ export class Pos{
     x:number = 0;
     y:number = 0;
     constructor();
+    constructor(pos:Pos);
     constructor(x:number, y:number);
-    constructor(x?:number, y?:number)
+    constructor(xOrPos?:Pos|number, y?:number)
     {
-        if(typeof x === "number") {
-            this.x=x;
+        if(typeof xOrPos === "number") {
+            this.x=xOrPos;
             this.y=y;
         }
+        else if(xOrPos instanceof Pos) {
+            this.x=xOrPos.x;
+            this.y=xOrPos.y;
+        }
+    }
+    assign(pos:Pos);
+    assign(x:number, y:number);
+    assign(xOrPos:Pos|number, y?:number)
+    {
+        if(xOrPos instanceof Pos) {
+            this.x=xOrPos.x;
+            this.y=xOrPos.y;
+        }
+        else {
+            this.x=xOrPos;
+            this.y=y;
+        }
+        return this;
     }
     add(x:number, y:number);
     add(p:Pos);

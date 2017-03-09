@@ -18,11 +18,17 @@ export class Level extends UIBase {
         const countX = Math.ceil(this.rect.size.width / 32) + 1;
         const countY = Math.ceil(this.rect.size.height / 32) + 1;
         gr.setClip(this.rect);
-        for(let x=0;x<countX;++x) {
+        let pos = new Pos(this.shift);
+        for(let i=0;i<10;++i) {
+            let f=i<5?i:9-i;
+            TileManager.instance.drawTile(pos, 'pipe', f);
+            pos.y+=32;
+        }
+        /*for(let x=0;x<countX;++x) {
             for(let y=0;y<countY;++y) {
                 TileManager.instance.drawTile(new Pos(this.shift.x+x*32, this.shift.y+y*32), 'a');
             }
-        }
+        }*/
         gr.resetClip();
     }
     onMouseDown(e:MyMouseEvent)
