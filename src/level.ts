@@ -21,9 +21,17 @@ export class Level extends UIBase {
         let pos = new Pos(this.shift);
         for(let i=0;i<10;++i) {
             let f=i<5?i:9-i;
-            TileManager.instance.drawTile(pos, 'pipe', f);
+            TileManager.instance.drawTile(pos, 'wall-tb', f);
             pos.y+=32;
         }
+        TileManager.instance.drawTile(pos, 'wall-tr', 0);
+        pos.x+=32;
+        for(let i=0;i<10;++i) {
+            let f=i<5?i:9-i;
+            TileManager.instance.drawTile(pos, 'wall-lr', f);
+            pos.x+=32;
+        }
+        TileManager.instance.drawTile(pos, 'circle', 0);
         /*for(let x=0;x<countX;++x) {
             for(let y=0;y<countY;++y) {
                 TileManager.instance.drawTile(new Pos(this.shift.x+x*32, this.shift.y+y*32), 'a');

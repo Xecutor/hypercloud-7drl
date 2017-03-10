@@ -15,9 +15,9 @@ export class Pos{
             this.y=xOrPos.y;
         }
     }
-    assign(pos:Pos);
-    assign(x:number, y:number);
-    assign(xOrPos:Pos|number, y?:number)
+    assign(pos:Pos):Pos;
+    assign(x:number, y:number):Pos;
+    assign(xOrPos:Pos|number, y?:number):Pos
     {
         if(xOrPos instanceof Pos) {
             this.x=xOrPos.x;
@@ -29,9 +29,9 @@ export class Pos{
         }
         return this;
     }
-    add(x:number, y:number);
-    add(p:Pos);
-    add(x:Pos|number, y?:number)
+    add(x:number, y:number):Pos;
+    add(p:Pos):Pos;
+    add(x:Pos|number, y?:number):Pos
     {
         if(typeof x == "number") {
             this.x+=x;

@@ -13,7 +13,7 @@ class FrameInfo{
     setInfo(innerPos:Pos)
     {
         this.innerRect.pos.assign(innerPos);
-        this.outerRect.pos.assign(innerPos).add(tileGlowSize, tileGlowSize);
+        this.outerRect.pos.assign(innerPos).add(-tileGlowSize, -tileGlowSize);
 
     }
 }
@@ -45,7 +45,7 @@ export class TileManager{
     {
         let idx = this.cacheLastIdx++;
         const tilesPerRow = (cacheCanvasWidth/tileFullSize)|0;
-        let y = ( idx / tilesPerRow ) * tileFullSize;
+        let y = (( idx / tilesPerRow ) | 0) * tileFullSize;
         let x = ( idx % tilesPerRow ) * tileFullSize;
         return new Pos(x + tileGlowSize, y + tileGlowSize);
     }
@@ -73,19 +73,28 @@ export class TileManager{
         let r=this.getCacheRecord('circle');
         r.addFrame(pos);
         let c = pos.clone().add(tileSize/2, tileSize/2);
-        for(let i=0;i<4;++i)
+        for(let i=0;i<2;++i)
         {
             ctx.beginPath();
-            ctx.arc(pos.x,pos.y,((tileSize/2)|0) -2,0,Math.PI*2);
+            ctx.arc(c.x,c.y,((tileSize/2)|0) -2,0,Math.PI*2);
             ctx.stroke();
         }
 
-        r=this.getCacheRecord('pipe');
+        this.genWalls();
+
+    }
+    genWalls()
+    {
+        let ctx=this.cacheCanvas.getContext('2d');
         ctx.lineWidth=4;
+        ctx.lineCap="round";
+        let pos:Pos;
+        let r=this.getCacheRecord('wall-tb');
         for(let f=0;f<5;++f) {
             pos=this.getNextCachePos();
+            console.log(pos);
             r.addFrame(pos);
-            for(let i=0;i<3+f;++i) {
+            for(let i=0;i<1+f;++i) {
                 ctx.beginPath();
                 ctx.moveTo(pos.x+tileSize/2, pos.y);
                 ctx.lineTo(pos.x+tileSize/2, pos.y+tileSize);
@@ -93,14 +102,42 @@ export class TileManager{
             }
         }
 
+        r=this.getCacheRecord('wall-lr');
+        for(let f=0;f<5;++f) {
+            pos=this.getNextCachePos();
+            console.log(pos);
+            r.addFrame(pos);
+            for(let i=0;i<1+f;++i) {
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y + tileSize/2);
+                ctx.lineTo(pos.x+tileSize, pos.y+tileSize/2);
+                ctx.stroke();
+            }
+        }
+        r=this.getCacheRecord('wall-tr');
+        for(let f=0;f<5;++f) {
+            pos=this.getNextCachePos();
+            console.log(pos);
+            r.addFrame(pos);
+            for(let i=0;i<1+f;++i) {
+                ctx.beginPath();
+                ctx.moveTo(pos.x+tileSize/2, pos.y);
+                ctx.lineTo(pos.x+tileSize/2, pos.y+tileSize/4);
+                ctx.arc(pos.x+3*tileSize/4,pos.y+tileSize/4,tileSize/4,Math.PI, Math.PI/2, true);
+                ctx.moveTo(pos.x+3*tileSize/4, pos.y+tileSize/2);
+                ctx.lineTo(pos.x+tileSize, pos.y+tileSize/2);
+                ctx.stroke();
+            }
+        }
     }
     drawTile(pos:Pos, tileName:string, frame:number = 0)
     {
         let ctx=gr.getCtx();
+        //ctx.drawImage(this.cacheCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
         let r=this.cache[tileName];
         if(r && frame<r.frames.length) {
             let fi=r.frames[frame];
-            ctx.drawImage(this.cacheCanvas, fi.innerRect.pos.x, tileFullSize,tileFullSize,pos.x, pos.y,tileFullSize,tileFullSize);
+            ctx.drawImage(this.cacheCanvas, fi.outerRect.pos.x, fi.outerRect.pos.y,tileFullSize,tileFullSize,pos.x-tileGlowSize, pos.y-tileGlowSize,tileFullSize,tileFullSize);
         }
     }
 }
