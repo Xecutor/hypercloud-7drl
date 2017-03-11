@@ -1,3 +1,5 @@
+import { Player } from './player';
+import { TestGenerator } from './generators';
 import { Level } from './level';
 import { uiManager } from './uimanager';
 import { UIContainer } from './uicontainer';
@@ -26,7 +28,11 @@ export class MenuItem extends UIBase {
     {
         this.parent.close();
         uiManager.add(new Hud())
-        uiManager.add(new Level())
+        let l=new Level();
+        let gen=new TestGenerator();
+        gen.generate(l);
+        l.addPlayer(new Player);
+        uiManager.add(l)
         console.log("down");
     }
 }

@@ -43,6 +43,20 @@ export class Pos{
         }
         return this;
     }
+    sub(x:number, y:number):Pos;
+    sub(p:Pos):Pos;
+    sub(x:Pos|number, y?:number):Pos
+    {
+        if(typeof x == "number") {
+            this.x-=x;
+            this.y-=y;
+        }
+        else {
+            this.x-=x.x;
+            this.y-=x.y;
+        }
+        return this;
+    }
     mul(n:number)
     {
         this.x*=n;
@@ -58,6 +72,18 @@ export class Pos{
     clone()
     {
         return new Pos(this.x, this.y);
+    }
+    clamp(rect:Rect)
+    {
+        if(this.x<rect.pos.x)this.x=rect.pos.x;
+        if(this.x>rect.pos.x+rect.size.width)this.x=rect.pos.x+rect.size.width;
+        if(this.y<rect.pos.y)this.y=rect.pos.y;
+        if(this.y>rect.pos.y+rect.size.height)this.y=rect.pos.y+rect.size.height;
+        return this;
+    }
+    toSize()
+    {
+        return new Size(this.x, this.y);
     }
 }
 
@@ -77,9 +103,41 @@ export class Size{
     {
         return new Size(this.width, this.height);
     }
+    toPos()
+    {
+        return new Pos(this.width, this.height);
+    }
 }
 
-export class Rect{
+export class RectIterator{
+    rect:Rect;
+    value:Pos=null;
+    constructor(rect:Rect)
+    {
+        this.rect=rect;
+    }
+    next()
+    {
+        if(this.value) {
+            let maxY=this.rect.pos.y+this.rect.size.height;
+            if(this.value.y>maxY) {
+                return false;
+            }
+            this.value.x+=1;
+            if(this.value.x>this.rect.pos.x+this.rect.size.width) {
+                this.value.x=this.rect.pos.x;
+                this.value.y+=1;
+            }
+            return this.value.y<=maxY;
+        }
+        else {
+            this.value=this.rect.pos.clone();
+        }
+        return true;
+    }
+}
+
+export class Rect {
     pos: Pos = new Pos;
     size:Size = new Size;
     constructor();
@@ -109,5 +167,21 @@ export class Rect{
     clone()
     {
         return new Rect(this.pos.clone(), this.size.clone());
+    }
+    bottomRight(newValue?:Pos)
+    {
+        if(newValue) {
+            if(newValue.x>this.pos.x) {
+                this.size.width=newValue.x-this.pos.x;
+            }
+            if(newValue.y>this.pos.y) {
+                this.size.height=newValue.y-this.pos.y;
+            }
+        }
+        return this.pos.clone().add(this.size.width, this.size.height);
+    }
+    getIterator()
+    {
+        return new RectIterator(this);
     }
 }

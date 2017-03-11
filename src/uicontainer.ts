@@ -7,9 +7,10 @@ export class UIContainer extends UIBase {
     add(obj: UIBase) {
         obj.parent=this;
         this.objects.push(obj);
-        obj.draw();
+        if(obj.onAdd)obj.onAdd();
     }
     remove(obj: UIBase) {
+        if(obj.onRemove)obj.onRemove();
         this.objects = this.objects.filter((arg) => arg !== obj);
     }
     postMouseEvent(name: string, e: MyMouseEvent) {

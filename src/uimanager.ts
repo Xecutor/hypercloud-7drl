@@ -1,3 +1,4 @@
+import { Animation } from './animation';
 import { MyMouseEvent } from './uibase';
 import { Rect } from './utils';
 import {UIBase} from 'uibase';
@@ -7,6 +8,7 @@ import * as gr from 'graphics';
 
 class UIManager extends UIContainer{
     timerId:number;
+    animations:Array<Animation>=[];
     constructor()
     {
         super();
@@ -28,7 +30,12 @@ class UIManager extends UIContainer{
     draw()
     {
         gr.clear();
+        this.animations=this.animations.filter((ani:Animation)=>ani.nextFrame());
         super.draw();
+    }
+    addAnimation(ani:Animation)
+    {
+        this.animations.push(ani);
     }
 }
 

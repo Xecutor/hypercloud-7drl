@@ -1,3 +1,4 @@
+import { Mousetrap } from './mousewrap';
 import { UIContainer } from './uicontainer';
 import { Pos, Size, Rect } from './utils';
 import { getAppRect } from "./graphics";
@@ -17,6 +18,7 @@ export class MyMouseEvent {
 export class UIBase {
     rect:Rect = getAppRect().clone();
     parent:UIContainer;
+    bindings=Mousetrap();
     draw()
     {
     }
@@ -33,4 +35,10 @@ export class UIBase {
     onMouseUp(e:MyMouseEvent){}
     onMouseEnter(e:MyMouseEvent){}
     onMouseLeave(e:MyMouseEvent){}
+
+    onAdd?();
+    onRemove()
+    {
+        this.bindings.reset();
+    }
 }
