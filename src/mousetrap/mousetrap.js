@@ -827,7 +827,7 @@
             // store a direct mapped reference for use with Mousetrap.trigger
             self._directMap[combination + ':' + action] = callback;
 
-            console.log(self._directMap);
+            //console.log(self._directMap);
 
             // make sure multiple spaces in a row become a single space
             combination = combination.replace(/\s+/g, ' ');

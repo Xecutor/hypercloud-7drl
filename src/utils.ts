@@ -85,6 +85,14 @@ export class Pos{
     {
         return new Size(this.x, this.y);
     }
+    isEqual(pos:Pos)
+    {
+        return this.x==pos.x && this.y==pos.y;
+    }
+    length()
+    {
+        return Math.sqrt(this.x*this.x+this.y*this.y);
+    }
 }
 
 export class Size{
@@ -168,15 +176,21 @@ export class Rect {
     {
         return new Rect(this.pos.clone(), this.size.clone());
     }
+    middle()
+    {
+        return new Pos(this.pos.x+this.size.width/2, this.pos.y+this.size.height/2);
+    }
+    setTopLeft(newValue:Pos)
+    {
+        this.size.width+=this.pos.x-newValue.x;
+        this.size.height+=this.pos.y-newValue.y;
+        this.pos.assign(newValue);
+    }
     bottomRight(newValue?:Pos)
     {
         if(newValue) {
-            if(newValue.x>this.pos.x) {
-                this.size.width=newValue.x-this.pos.x;
-            }
-            if(newValue.y>this.pos.y) {
-                this.size.height=newValue.y-this.pos.y;
-            }
+            this.size.width=newValue.x-this.pos.x;
+            this.size.height=newValue.y-this.pos.y;
         }
         return this.pos.clone().add(this.size.width, this.size.height);
     }
@@ -184,4 +198,10 @@ export class Rect {
     {
         return new RectIterator(this);
     }
+}
+
+export function randomFromArray<T>(a:Array<T>)
+{
+    let idx=(Math.random()*a.length)|0;
+    return a[idx];
 }

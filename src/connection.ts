@@ -5,6 +5,7 @@ import { dirs } from "./tiles";
 
 export class ConnectionPiece extends Entity {
     conn=[false,false,false,false]
+    prefix='my';
     constructor(srcDir:number,startFrame:number=0)
     {
         super();
@@ -21,6 +22,17 @@ export class ConnectionPiece extends Entity {
                 type+=dirs[dir];
             }
         }
-        this.tileName='connection-piece-'+type;
+        this.tileName=this.prefix+'-connection-piece-'+type;
+    }
+    getDescription()
+    {
+        return 'Active Connection';
+    }
+    decInt(val)
+    {
+    }
+    getInt()
+    {
+        return 100;
     }
 }

@@ -185,7 +185,7 @@ export class TileManager{
 
         this.genPlayer();
         this.genMarker();
-        this.genConnection();
+        this.genConnection('my');
         this.genWalls();
         this.genFeatures();
         this.genFloor();
@@ -195,7 +195,12 @@ export class TileManager{
         ctx.strokeStyle='red';
         
         this.genEnemies();
+        this.genConnection('enemy');
 
+        const tilesPerRow = (cacheCanvasWidth/tileFullSize)|0;
+        const totalRows = (cacheCanvasHeight/tileFullSize)|0;
+        const totalTiles = tilesPerRow*totalRows;
+        console.log(`cache:${this.cacheLastIdx}/${totalTiles} (%${100*this.cacheLastIdx/totalTiles})`);
     }
 
     private genMarker()
@@ -221,10 +226,31 @@ export class TileManager{
     {
         let r=this.getCacheRecord('connector');
         r.addFrame(this.getNextCachePos());
+        let box=[DP.line,0.1,0.1,0.9,0.1,0.9,0.9,0.1,0.9,0.1,0.1];
         this.drawFigure([
-            [DP.line,0.1,0.1,0.9,0.1,0.9,0.9,0.1,0.9,0.1,0.1],
+            box,
             [DP.line,0.25,0.5, 0.5, 0.25, 0.75, 0.5, 0.5, 0.75, 0.25, 0.5]
         ], 1)
+        
+        r=this.getCacheRecord('data-box');
+        r.addFrame(this.getNextCachePos());
+        this.drawFigure([
+            box,
+            [DP.line,0.2, 0.3, 0.8, 0.3],
+            [DP.line,0.2, 0.5, 0.8, 0.5],
+            [DP.line,0.2, 0.7, 0.8, 0.7],
+        ], 1)
+    
+        r=this.getCacheRecord('data-processor');
+        for(let f=0;f<11;++f) {
+            r.addFrame(this.getNextCachePos());
+            let x1=0.8*(f>4?10-f:f)/5;
+            let x2=0.8-x1;
+            this.drawFigure([
+                box,
+                [DP.line,0.1+x1, 0.1, 0.1+x2, 0.9],
+            ], 1)
+        }
     }
 
     private genPlayer()
@@ -240,10 +266,10 @@ export class TileManager{
         ],2);
     }
 
-    private genConnection()
+    private genConnection(prefix)
     {
         const rep=1;
-        let r=this.getCacheRecord('connection-piece-lr');
+        let r=this.getCacheRecord(prefix+'-connection-piece-lr');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
             let fig1=[DP.line];
@@ -251,7 +277,7 @@ export class TileManager{
             genHWaves(fig1, fig2, f, 0, 1);
             this.drawFigure([fig1,fig2],rep);
         }
-        r=this.getCacheRecord('connection-piece-tb');
+        r=this.getCacheRecord(prefix+'-connection-piece-tb');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
             let fig1=[DP.line];
@@ -260,7 +286,7 @@ export class TileManager{
             this.drawFigure([fig1,fig2],rep);
         }
         let sq=[DP.line, 0.25, 0.25, 0.25, 0.75, 0.75, 0.75, 0.75, 0.25, 0.25, 0.25];
-        r=this.getCacheRecord('connection-piece-bl');
+        r=this.getCacheRecord(prefix+'-connection-piece-bl');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -276,7 +302,7 @@ export class TileManager{
             fig2[idx2]=fig2[idx2+2];
             this.drawFigure([fig1,fig2,sq],rep);
         }
-        r=this.getCacheRecord('connection-piece-br');
+        r=this.getCacheRecord(prefix+'-connection-piece-br');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -294,7 +320,7 @@ export class TileManager{
             fig2[idx2]=fig2[idx2+2];
             this.drawFigure([fig1,fig2,sq],rep);
         }
-        r=this.getCacheRecord('connection-piece-tl');
+        r=this.getCacheRecord(prefix+'-connection-piece-tl');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -312,7 +338,7 @@ export class TileManager{
             fig2[idx2]=fig2[idx2+2];
             this.drawFigure([fig1,fig2,sq],rep);
         }
-        r=this.getCacheRecord('connection-piece-tr');
+        r=this.getCacheRecord(prefix+'-connection-piece-tr');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -328,7 +354,7 @@ export class TileManager{
             fig2[idx2+1]=fig2[idx2+3];
             this.drawFigure([fig1,fig2,sq],rep);
         }
-        r=this.getCacheRecord('connection-piece-tlr');
+        r=this.getCacheRecord(prefix+'-connection-piece-tlr');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -354,7 +380,7 @@ export class TileManager{
             fig2.push(x2,y2);
             this.drawFigure([fig1,fig2],rep);
         }
-        r=this.getCacheRecord('connection-piece-blr');
+        r=this.getCacheRecord(prefix+'-connection-piece-blr');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -381,7 +407,7 @@ export class TileManager{
             this.drawFigure([fig1,fig2],rep);
 
         }
-        r=this.getCacheRecord('connection-piece-tbl');
+        r=this.getCacheRecord(prefix+'-connection-piece-tbl');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -409,7 +435,7 @@ export class TileManager{
             genVWaves(fig1, fig2, f, 0.7, 1.1);
             this.drawFigure([fig1,fig2],rep);
         }
-        r=this.getCacheRecord('connection-piece-tbr');
+        r=this.getCacheRecord(prefix+'-connection-piece-tbr');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -435,7 +461,7 @@ export class TileManager{
             genVWaves(fig1, fig2, f, 0.7, 1.1);
             this.drawFigure([fig1,fig2],rep);
         }
-        r=this.getCacheRecord('connection-piece-tblr');
+        r=this.getCacheRecord(prefix+'-connection-piece-tblr');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -467,7 +493,7 @@ export class TileManager{
             fig2.push(x2,y2);
             this.drawFigure([fig1,fig2],rep);
         }
-        r=this.getCacheRecord('connection-piece-t');
+        r=this.getCacheRecord(prefix+'-connection-piece-t');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -479,7 +505,7 @@ export class TileManager{
             genSparks(fa,f);
             this.drawFigure(fa,rep);
         }
-        r=this.getCacheRecord('connection-piece-b');
+        r=this.getCacheRecord(prefix+'-connection-piece-b');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -491,7 +517,7 @@ export class TileManager{
             genSparks(fa,f);
             this.drawFigure(fa,rep);
         }
-        r=this.getCacheRecord('connection-piece-l');
+        r=this.getCacheRecord(prefix+'-connection-piece-l');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
@@ -503,7 +529,7 @@ export class TileManager{
             genSparks(fa,f);
             this.drawFigure(fa,rep);
         }
-        r=this.getCacheRecord('connection-piece-r');
+        r=this.getCacheRecord(prefix+'-connection-piece-r');
         for(let f=0;f<25;++f) {
             r.addFrame(this.getNextCachePos());
 
