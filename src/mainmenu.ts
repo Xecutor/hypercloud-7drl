@@ -1,3 +1,4 @@
+import { Button } from './button';
 import { Game } from './game';
 import { Animation, FwdAndBackAnimation } from './animation';
 import { tileSize, TileManager } from './tilemanager';
@@ -7,47 +8,12 @@ import { Level } from './level';
 import { uiManager } from './uimanager';
 import { UIContainer } from './uicontainer';
 import * as gr from './graphics';
-import {Mousetrap} from './mousewrap';
 import { UIBase, MyMouseEvent } from './uibase';
 import { Rect, Size, Pos } from './utils';
-import { Hud } from "./hud";
 
 const versionInfo = 'v0.2';
 const author='Made by Konstantin Stupnik aka Xecutor for 7DRL 2017 ';
 
-export class MenuItem extends UIBase {
-    color:string = 'white';
-    label:string;
-    mouseOver=false;
-    onClick:()=>void;
-    constructor(label:string, onClick:()=>void) 
-    {
-        super();
-        this.label=label;
-        this.onClick=onClick;
-    }
-    draw()
-    {
-        gr.setFontSize(32);
-        gr.rect(this.rect, 'cyan', 2, this.mouseOver?10:0);
-        let pos=this.rect.size.toPos().sub(gr.getTextSize(this.label).toPos()).div(2).add(this.rect.pos);
-        gr.textout(pos.x, pos.y, this.color, this.label);
-    }
-    onMouseEnter(e:MyMouseEvent)
-    {
-        this.mouseOver=true;
-    }
-    onMouseLeave(e:MyMouseEvent)
-    {
-        this.mouseOver=false;
-    }
-    onMouseDown(e:MyMouseEvent)
-    {
-        if(this.onClick) {
-            this.onClick();
-        }
-    }
-}
 
 let logo:Array<string>=[
     'br bl br bl    br bl br bl    br lr lr bl    br lr lr bl    br lr lr bl    br lr lr bl    br bl          br lr lr bl    br bl br bl    br lr bl    ',
@@ -64,14 +30,14 @@ export class MainMenu extends UIContainer {
     constructor()
     {
         super();
-        let m : MenuItem = new MenuItem('Start',()=>this.startGame());
+        let m = new Button('Start',()=>this.startGame());
         let pos=this.rect.size.toPos().div(2);
         const menuWidth=256;
         pos.x-=menuWidth/2;
         m.rect = new Rect(pos.clone(), new Size(menuWidth, 64));
         this.add(m);
         pos.y+=64+32;
-        m = new MenuItem('Quit',()=>this.quitGame());
+        m = new Button('Quit',()=>this.quitGame());
         m.rect = new Rect( pos.clone(), new Size(menuWidth, 64));
         this.add(m);
     }

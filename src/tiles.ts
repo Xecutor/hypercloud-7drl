@@ -1,3 +1,6 @@
+import { TileManager } from './tilemanager';
+import { FwdAndBackAnimation } from './animation';
+import { uiManager } from 'uimanager';
 import { MapAccessor } from './generators';
 import { Pos } from 'utils';
 import { Entity } from './entity';
@@ -25,6 +28,7 @@ export function diffToDir(srcX:number, srcY: number, dstX:number, dstY:number)
 
 export interface TileBase{
     passable:boolean;
+    animate:boolean;
     getTileName(conn:Array<boolean>);
     getDescription();
 }
@@ -32,6 +36,7 @@ export interface TileBase{
 export class WallTile implements TileBase{
     passable=false;
     connector=false;
+    animate=false;
     getTileName(conn:Array<boolean>)
     {
         if(this.connector)return 'connector';
@@ -52,6 +57,7 @@ export class WallTile implements TileBase{
 
 export class FloorTile implements TileBase{
     passable=true;
+    animate=false;
     getTileName(conn:Array<boolean>)
     {
         let rv='floor-';
@@ -71,6 +77,7 @@ export class FloorTile implements TileBase{
 
 export class DataBoxTile implements TileBase{
     passable=false;
+    animate=false;
     getTileName(conn:Array<boolean>)
     {
         return 'data-box';
@@ -83,6 +90,7 @@ export class DataBoxTile implements TileBase{
 
 export class DataProcessorTile implements TileBase{
     passable=false;
+    animate=true;
     onFrame(frame)
     {
 
@@ -115,6 +123,18 @@ export class TileInfo{
     update()
     {
         this.tileName=this.tile.getTileName(this.conn);
+        if(this.tile.animate) {
+            uiManager.addAnimation(
+                new FwdAndBackAnimation(
+                    (frame)=>this.onFrame(frame), TileManager.instance.getTileFrames(this.tileName)
+                )
+            );
+        }
+    }
+    onFrame(frame)
+    {
+        this.tileFrame=frame;
+        return true;
     }
     addConn(dir)
     {

@@ -1,3 +1,4 @@
+import { ProgramList } from './programlist';
 import { uiManager } from 'uimanager';
 import { Animation } from './animation';
 import { ConnectionPiece } from './connection';
@@ -42,6 +43,7 @@ export class Level extends UIBase implements MapAccessor {
     conns:Array<Pos>=[];
     markerFrame:number=0;
 
+    lastPathSrc=new Pos();
     lastPathPos=new Pos();
     lastPath:Array<Pos>=[];
 
@@ -60,14 +62,17 @@ export class Level extends UIBase implements MapAccessor {
     
     onAdd()
     {
-        for(let key of ['up','down','left','right']) {
-            this.bindings.bind(key, ()=>this.move(key));
+        let moveKeys=[['up','w'],['down','s'],['left','a'],['right','d']];
+        for(let i=0;i<4;++i) {
+            this.bindings.bind(moveKeys[i], ()=>this.move(DIR[dirs[i]]));
         }
         this.bindings.bind('q',()=>this.toggleDebugTiles());
         this.bindings.bind('c', ()=>this.toggleConnMode());
         this.bindings.bind('tab', ()=>this.switchConn());
         this.bindings.bind('b', ()=>this.branchConn());
         this.bindings.bind('shift+c',()=>this.centerCurrent())
+
+        this.bindings.bind('i', ()=>this.showPrograms());
     }
     
     toggleDebugTiles()
@@ -101,6 +106,11 @@ export class Level extends UIBase implements MapAccessor {
     setEntrance(entrance:Pos)
     {
         this.entrance=entrance.clone();
+    }
+
+    showPrograms()
+    {
+        uiManager.showModal(new ProgramList(this.player));
     }
 
     addPlayer(player:Player)
@@ -173,15 +183,8 @@ export class Level extends UIBase implements MapAccessor {
         return !r.isInside(pos);
     }
 
-    move(key:string)
+    move(dir:number)
     {
-        let dir;
-        switch(key){
-            case 'up':dir=DIR.t;break;
-            case 'down':dir=DIR.b;break;
-            case 'left':dir=DIR.l;break;
-            case 'right':dir=DIR.r;break;
-        }
         let dx=dirX[dir];
         let dy=dirY[dir];
         if(this.connMode) {
@@ -362,12 +365,14 @@ export class Level extends UIBase implements MapAccessor {
             return;
         }
         this.resetLastPath();
+        let src=this.connMode?this.conns[this.activeConn]:this.player.pos;
+        this.lastPathSrc.assign(src);
         this.lastPathPos.assign(this.mouseMapPos);
-        if(this.player.pos.isEqual(this.lastPathPos)) {
+        if(src.isEqual(this.lastPathPos)) {
             return;
         }
         let path=new ROT.Path.AStar(this.lastPathPos.x, this.lastPathPos.y, (x,y, sx, sy)=>this.passabilityTest(x,y,sx,sy),{topology:4});
-        path.compute(this.player.pos.x, this.player.pos.y, (x,y)=>this.addToPath(x,y));
+        path.compute(src.x, src.y, (x,y)=>this.addToPath(x,y));
         for(let pos of this.lastPath) {
             this.mapGet(pos.x, pos.y).tileFrame=3;
         }
@@ -376,10 +381,15 @@ export class Level extends UIBase implements MapAccessor {
     passabilityTest(x:number, y:number, sx: number, sy:number)
     {
         let sti=this.mapGet(sx,sy);
-        let dir=diffToDir(sx,sy,x,y);
-        if(!sti.conn[dir])return false;
+        if(!this.connMode) {
+            let dir=diffToDir(sx,sy,x,y);
+            if(!sti.conn[dir])return false;
+        }
+        if(this.lastPathSrc.x==x && this.lastPathSrc.y==y) {
+            return true;
+        }
         let ti=this.mapGet(x,y);
-        return ti && ti.passable;
+        return ti && ti.passable && !ti.entity;
     }
 
     onMouseDown(e:MyMouseEvent)
@@ -402,8 +412,8 @@ export class Level extends UIBase implements MapAccessor {
     updateMapMousePos(e:MyMouseEvent)
     {
         if(this.debugTiles) {
-            this.mouseMapPos.x=Math.floor((this.offset.x+e.x)/tileFullSize);
-            this.mouseMapPos.y=Math.floor((this.offset.y+e.y)/tileFullSize);
+            this.mouseMapPos.x=Math.floor((e.x)/tileFullSize);
+            this.mouseMapPos.y=Math.floor((e.y)/tileFullSize);
         }
         else {
             this.mouseMapPos.x=Math.floor((this.offset.x+e.x)/tileSize);
@@ -428,9 +438,13 @@ export class Level extends UIBase implements MapAccessor {
 
     onClick(e:MyMouseEvent)
     {
-        let ti=this.mapGet(this.mouseMapPos.x, this.mouseMapPos.y);
-        if(ti) {
-            console.log(ti.passable);
+        if(this.lastPath.length) {
+            let src=this.connMode?this.conns[this.activeConn]:this.player.pos;
+            let dst=this.lastPath[1];
+            let dir=diffToDir(src.x, src.y, dst.x, dst.y);
+            this.move(dir);
+            this.lastPathPos.assign(src);
+            this.updatePath();
         }
     }
 }

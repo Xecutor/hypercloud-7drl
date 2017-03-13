@@ -30,6 +30,17 @@ export class UIBase {
     {
         return this.rect.isInside(pos);
     }
+
+    pauseBindings()
+    {
+        this.bindings.pause();
+    }
+
+    resumeBindings()
+    {
+        this.bindings.unpause();
+    }
+
     onMouseMove(e:MyMouseEvent){}
     onMouseDown(e:MyMouseEvent){}
     onMouseUp(e:MyMouseEvent){}

@@ -107,6 +107,11 @@ export class Size{
             this.height = height;
         }
     }
+    assign(size:Size)
+    {
+        this.width=size.width;
+        this.height=size.height;
+    }
     clone()
     {
         return new Size(this.width, this.height);

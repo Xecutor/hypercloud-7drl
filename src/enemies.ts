@@ -32,7 +32,7 @@ export class Spyware extends Entity {
     {
         super();
         this.tileName='spyware';
-        uiManager.addAnimation(new FwdAndBackAnimation((frame)=>this.onFrame(frame),TileManager.instance.getTileFrames(this.tileName)));
+        uiManager.addAnimation(new FwdAndBackAnimation((frame)=>this.onFrame(frame),TileManager.instance.getTileFrames(this.tileName) - 1));
     }
     getDescription()
     {

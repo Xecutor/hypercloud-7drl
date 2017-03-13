@@ -1,3 +1,4 @@
+import { Program, SecurityAnalyzer } from './programs';
 import { Resource, RES } from './resources';
 import { Entity } from './entity';
 
@@ -10,6 +11,9 @@ export class Player extends Entity {
         new Resource('NET', 'cyan'),
         new Resource('INT', 'gold'),
     ];
+    
+    programs:Array<Program>=[new SecurityAnalyzer, new SecurityAnalyzer];
+
     constructor()
     {
         super();

@@ -3,7 +3,7 @@ import { Player } from './player';
 import { LevelGenerator } from './generators';
 import { Pos, Rect, RectIterator, randomFromArray } from './utils';
 import { TileInfo, TileBase, WallTile, dirX, dirY, FloorTurtle, DIR, FloorTile, DataBoxTile, diffToDir, DataProcessorTile } from './tiles';
-import { Spyware } from "./enemies";
+import { Spyware, Muncher } from "./enemies";
 import { Entity } from "./entity";
 import ROT from './rotwrap';
 
@@ -60,6 +60,9 @@ export class TestGenerator implements LevelGenerator {
     walls:Array<Pos>=[]
     pfCount:number;
     debugPf:boolean;
+
+    corridors:Array<Pos>=[]
+
     fixWallConn()
     {
         let m =this.m;
@@ -139,11 +142,13 @@ export class TestGenerator implements LevelGenerator {
         let lastx:number=src.x;
         let lasty:number=src.y;
         let success = false;
+        let cor=this.corridors;
         astar.compute(src.x, src.y, function(x, y){
             success=true;
             if(lastx==x && lasty==y) {
                 return;
             }
+            cor.push(new Pos(x,y));
             let dir=diffToDir(lastx, lasty, x, y);
             turtle.move(dir, 1);
             lastx=x;
@@ -282,7 +287,12 @@ export class TestGenerator implements LevelGenerator {
 
         this.clearUnused();
 
-        m.mapGet(10,10).setEntity(new Spyware);
+        for(let i=0;i<5;++i) {
+            pos=randomFromArray(this.corridors);
+            let enemies=[Spyware, Muncher];
+            let cls=randomFromArray(enemies);
+            m.mapGet(pos.x,pos.y).setEntity(new cls);
+        }
 
         for(let it=m.mapRect.getIterator();it.next();) {
             let ti=m.mapGet(it.value.x, it.value.y);
