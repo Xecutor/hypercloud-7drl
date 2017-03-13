@@ -24,7 +24,7 @@ export class Hud extends UIContainer{
     draw()
     {
         gr.rect(this.rect, 'cyan');
-        gr.setFontSize(32);
+        gr.setFontSize(16);
         let pos=this.rect.pos.clone().add(10,10);
         for(let i=0;i<RES.count;++i) {
             let r=this.player.getResource(i);
@@ -36,7 +36,6 @@ export class Hud extends UIContainer{
         if(ti && ti.tile) {
             TileManager.instance.drawTile(pos, ti.tileName, ti.tileFrame);
             pos.y+=tileFullSize;
-            gr.setFontSize(16);
             gr.textout(pos.x, pos.y, 'white', ti.tile.getDescription());
             pos.y+= gr.getTextHeight();
             if(ti.entity) {

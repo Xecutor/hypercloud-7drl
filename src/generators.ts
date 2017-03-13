@@ -3,7 +3,7 @@ import { Player } from './player';
 import { LevelGenerator } from './generators';
 import { Pos, Rect, RectIterator, randomFromArray } from './utils';
 import { TileInfo, TileBase, WallTile, dirX, dirY, FloorTurtle, DIR, FloorTile, DataBoxTile, diffToDir, DataProcessorTile } from './tiles';
-import { BasicEnemy } from "./enemies";
+import { Spyware } from "./enemies";
 import { Entity } from "./entity";
 import ROT from './rotwrap';
 
@@ -259,10 +259,12 @@ export class TestGenerator implements LevelGenerator {
             }while(!goodWall);
 
             (<WallTile>m.mapGet(wp.x, wp.y).tile).connector=true;
-            let p = randomFromArray(poi);
+            for(let j=0;j<3;++j) {
+                let p = randomFromArray(poi);
 
-            if(!this.connect(wp, p)){
-                console.log("failed from ", wp, " to ", p);
+                if(!this.connect(wp, p)){
+                    console.log("failed from ", wp, " to ", p);
+                }
             }
 
             for(let j=0;j<4;++j) {
@@ -279,6 +281,8 @@ export class TestGenerator implements LevelGenerator {
         // goto(new Pos(5,1)).move(DIR.b,8);
 
         this.clearUnused();
+
+        m.mapGet(10,10).setEntity(new Spyware);
 
         for(let it=m.mapRect.getIterator();it.next();) {
             let ti=m.mapGet(it.value.x, it.value.y);

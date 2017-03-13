@@ -299,7 +299,8 @@ export class Level extends UIBase implements MapAccessor {
     {
         if(this.debugTiles) {
             let ctx=gr.getCtx();
-            ctx.drawImage(TileManager.instance.cacheCanvas, 0, 0);
+            let c=TileManager.instance.cacheCanvas;
+            ctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, c.width, c.height);
             ctx.fillStyle='rgba(255,255,255,0.3)';
             ctx.fillRect(this.mouseMapPos.x*tileFullSize, this.mouseMapPos.y*tileFullSize, tileFullSize, tileFullSize);
             return;

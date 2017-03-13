@@ -224,6 +224,7 @@ export class TileManager{
 
     private genFeatures()
     {
+        this.ctx.lineWidth=2;
         let r=this.getCacheRecord('connector');
         r.addFrame(this.getNextCachePos());
         let box=[DP.line,0.1,0.1,0.9,0.1,0.9,0.9,0.1,0.9,0.1,0.1];
@@ -545,8 +546,8 @@ export class TileManager{
 
     private genEnemies()
     {
-        this.ctx.lineWidth=2;
-        let r=this.getCacheRecord('enemy');
+        this.ctx.lineWidth=1.5;
+        let r=this.getCacheRecord('muncher');
         for(let f=0;f<5;++f) {
             r.addFrame(this.getNextCachePos());
             let d=f/20;
@@ -564,6 +565,20 @@ export class TileManager{
                 [DP.line, 0.25+0.125,0.75-0.125-d, 0.5,0.75-d],
                 [DP.line, 0.5,0.75-d, 0.5+0.125,0.75-0.125-d],
                 [DP.line, 0.5+0.125,0.75-0.125-d, 0.75,0.75-d],
+            ],2);
+        }
+
+        r=this.getCacheRecord('spyware');
+        for(let f=0;f<10;++f) {
+            r.addFrame(this.getNextCachePos());
+            let d=0.15*f/10;
+            this.drawFigure([
+                [DP.arc, 0.5, 0.5, 0.45, 0, 2],
+                [DP.line, 0.2, 0.4, 0.2+d, 0.4],
+                [DP.line, 0.3+d, 0.4, 0.4, 0.4],
+                [DP.line, 0.6, 0.4, 0.6+d, 0.4],
+                [DP.line, 0.7+d, 0.4, 0.8, 0.4],
+                [DP.line, 0.25, 0.7, 0.75, 0.7]
             ],2);
         }
 
@@ -612,8 +627,8 @@ export class TileManager{
 
     genFloor()
     {
-        this.ctx.strokeStyle='#00A0A0';
-        this.ctx.lineWidth=2;
+        //this.ctx.strokeStyle='#00A0A0';
+        this.ctx.lineWidth=1.5;
         this.ctx.lineCap="round";
         this.genWallSegment('floor-tb', [[DP.line,0.5,0,0.5,1]]);
         this.genWallSegment('floor-lr',[[DP.line, 0, 0.5, 1, 0.5]])
@@ -656,6 +671,13 @@ export class TileManager{
             return fr;
         }
         return 0;
+    }
+    getTileFrames(tileName:string)
+    {
+        let r=this.cache[tileName];
+        if(r) {
+            return r.frames.length;
+        }
     }
 }
 
