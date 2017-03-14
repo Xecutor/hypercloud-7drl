@@ -5,6 +5,7 @@ export class UIContainer extends UIBase {
     objects: Array<UIBase> = new Array<UIBase>();
     currentMouseOver: UIBase = null;
     modal:UIBase = null;
+    modalsStack: Array<UIBase>=[];
     add(obj: UIBase) {
         obj.parent=this;
         this.objects.push(obj);
@@ -13,6 +14,10 @@ export class UIContainer extends UIBase {
     showModal(obj:UIBase)
     {
         this.objects.forEach((obj)=>obj.pauseBindings());
+        if(this.modal) {
+            this.modalsStack.push(this.modal);
+            this.modal.pauseBindings();
+        }
         obj.parent=this;
         this.modal=obj;
     }
@@ -20,7 +25,13 @@ export class UIContainer extends UIBase {
         if(obj.onRemove)obj.onRemove();
         if(obj===this.modal) {
             this.objects.forEach((obj)=>obj.resumeBindings());
-            this.modal=null;
+            if(this.modalsStack.length) {
+                this.modal=this.modalsStack.pop();
+                this.modal.resumeBindings();
+            }
+            else {
+                this.modal=null;
+            }
         }
         else {
             this.objects = this.objects.filter((arg) => arg !== obj);
@@ -72,6 +83,9 @@ export class UIContainer extends UIBase {
     {
         this.objects.forEach((obj)=>obj.draw());
         if(this.modal) {
+            for(let m of this.modalsStack) {
+                m.draw();
+            }
             this.modal.draw();
         }
     }

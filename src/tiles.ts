@@ -5,7 +5,7 @@ import { MapAccessor } from './generators';
 import { Pos } from 'utils';
 import { Entity } from './entity';
 
-export const dirs=['t','b','l','r'];
+//export const dirs=['t','b','l','r'];
 export const dirX=[0,0,-1,1];
 export const dirY=[-1,1,0,0];
 
@@ -44,7 +44,7 @@ export class WallTile implements TileBase{
         for(let idx=0;idx<conn.length;++idx)
         {
             if(conn[idx]) {
-                rv+=dirs[idx];
+                rv+=DIR[idx];
             }
         }
         return rv;
@@ -64,7 +64,7 @@ export class FloorTile implements TileBase{
         for(let idx=0;idx<conn.length;++idx)
         {
             if(conn[idx]) {
-                rv+=dirs[idx];
+                rv+=DIR[idx];
             }
         }
         return rv;

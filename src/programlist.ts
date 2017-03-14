@@ -6,6 +6,7 @@ import { Pos } from './utils';
 import { Player } from './player';
 import { UIBase, MyMouseEvent } from './uibase';
 import * as gr from './graphics';
+import { showMessageBox } from "./msgbox";
 
 let table=[
     {label:'Name', width: 300},
@@ -14,16 +15,25 @@ let table=[
     {label:'Mem', width: 50},
 ]
 
+enum ProgramAction {
+    load,
+    unload,
+    execute
+}
 
 class ProgramItem extends UIContainer {
     program:Program;
     descrLabel:Label;
     mouseOver=false;
-    constructor(pos:Pos, program:Program,descrLabel:Label)
+    index:number;
+    actionHandler:(action:ProgramAction, index:number)=>void;
+    constructor(pos:Pos, index:number, program:Program,descrLabel:Label, actionHandler:(action:ProgramAction, index:number)=>void)
     {
         super();
+        this.index=index;
         this.program=program;
         this.descrLabel=descrLabel;
+        this.actionHandler=actionHandler;
         this.rect.pos.assign(pos);
         this.build();
         this.autoSize();
@@ -40,7 +50,7 @@ class ProgramItem extends UIContainer {
             pos.x+=table[i].width;
         }
         if(p.isBackground) {
-            let b=new Button('Load', ()=>this.loadProgram(),16);
+            let b=new Button(p.loaded?'Unload':'Load', p.loaded?()=>this.unloadProgram():()=>this.loadProgram(),16);
             b.rect.pos.assign(pos);
             this.add(b)
         }
@@ -64,11 +74,15 @@ class ProgramItem extends UIContainer {
     }
     loadProgram()
     {
-
+        this.actionHandler(ProgramAction.load, this.index);
+    }
+    unloadProgram()
+    {
+        this.actionHandler(ProgramAction.unload, this.index);
     }
     executeProgram()
     {
-        
+        this.actionHandler(ProgramAction.execute, this.index);
     }
     draw()
     {
@@ -106,9 +120,15 @@ export class ProgramList extends UIContainer {
         
         pos.x=this.rect.pos.x;
         pos.y+=this.objects[0].rect.size.height;
-        player.programs.forEach((prog)=>this.add(new ProgramItem(pos, prog, this.descrLabel)));
+        let idx=0;
+        player.programs.forEach((prog)=>this.add(new ProgramItem(pos, idx++, prog, this.descrLabel, (action:ProgramAction, index:number)=>this.onProgramAction(action,index))));
 
     }
+    onProgramAction(action:ProgramAction, index:number)
+    {
+        showMessageBox(`\n${ProgramAction[action]}:${index}`);
+    }
+
     draw()
     {
         gr.fillrect(this.rect, '#202020');

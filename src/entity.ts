@@ -1,4 +1,4 @@
-import { dirX, dirY } from './tiles';
+import { dirX, dirY, DIR } from './tiles';
 import { MapAccessor } from './generators';
 import { Pos } from 'utils';
 
@@ -27,7 +27,7 @@ export abstract class Entity{
     {
     }
 
-    move(map:MapAccessor, dir:number)
+    move(map:MapAccessor, dir:DIR)
     {
         let dst=this.pos.clone();
         dst.x+=dirX[dir];

@@ -4,7 +4,7 @@ import { Animation } from './animation';
 import { ConnectionPiece } from './connection';
 import { Player } from './player';
 import { Entity } from './entity';
-import { TileInfo, TileBase, WallTile, dirX, dirY, FloorTurtle, DIR, dirs, inverseDir, diffToDir } from './tiles';
+import { TileInfo, TileBase, WallTile, dirX, dirY, FloorTurtle, DIR, inverseDir, diffToDir } from './tiles';
 import { MapAccessor, LevelGenerator } from './generators';
 import { TileManager, tileSize, tileFullSize } from './tilemanager';
 import { hudWIdth } from './hud';
@@ -67,7 +67,7 @@ export class Level extends UIBase implements MapAccessor {
     {
         let moveKeys=[['up','w'],['down','s'],['left','a'],['right','d']];
         for(let i=0;i<4;++i) {
-            this.bindings.bind(moveKeys[i], ()=>this.move(DIR[dirs[i]]));
+            this.bindings.bind(moveKeys[i], ()=>this.move(i));
         }
         this.bindings.bind('q',()=>this.toggleDebugTiles());
         this.bindings.bind('c', ()=>this.toggleConnMode());
@@ -201,7 +201,7 @@ export class Level extends UIBase implements MapAccessor {
         return !r.isInside(pos);
     }
 
-    move(dir:number)
+    move(dir:DIR)
     {
         let dx=dirX[dir];
         let dy=dirY[dir];
@@ -361,6 +361,13 @@ export class Level extends UIBase implements MapAccessor {
             pos=this.mapToScreen(this.conns[this.activeConn]);
             let fc=TileManager.instance.drawTile(pos, 'marker', this.markerFrame);
             this.markerFrame=(this.markerFrame+1)%fc;
+            for(let i=0;i<this.conns.length;++i) {
+                if(i==this.activeConn) {
+                    continue;
+                }
+                pos=this.mapToScreen(this.conns[i]);
+                TileManager.instance.drawTile(pos, 'marker', 1);
+            }
         }
         gr.resetClip();
     }

@@ -75,6 +75,16 @@ export function rect(r:Rect, clr:string, lineWidth?:number, glowSize?:number)
     }
 }
 
+export function line(from:Pos, to:Pos, color:string,lineWidth:number=1)
+{
+    ctx.lineWidth=lineWidth;
+    ctx.strokeStyle=color;
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+}
+
 export function setFontSize(sz:number)
 {
     fontSize=sz;

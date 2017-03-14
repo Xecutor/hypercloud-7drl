@@ -1,7 +1,7 @@
 import { uiManager } from './uimanager';
 import { Entity, EntityFraction } from './entity';
 import { FwdAndBackAnimation, CyclicAnimation } from "./animation";
-import { dirs } from "./tiles";
+import { DIR } from "./tiles";
 
 export class ConnectionPiece extends Entity {
     conn=[false,false,false,false]
@@ -26,7 +26,7 @@ export class ConnectionPiece extends Entity {
         let type='';
         for(let dir=0;dir<4;++dir) {
             if(this.conn[dir]) {
-                type+=dirs[dir];
+                type+=DIR[dir];
             }
         }
         this.tileName=this.prefix+'-connection-piece-'+type;
