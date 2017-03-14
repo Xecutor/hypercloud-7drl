@@ -49,6 +49,7 @@ export class WallTile implements TileBase{
         }
         return rv;
     }
+
     getDescription()
     {
         return this.connector?'Global network connector':'Global network channel';
