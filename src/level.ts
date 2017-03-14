@@ -41,6 +41,7 @@ export class Level extends UIBase implements MapAccessor {
     connMode=false;
     activeConn:number=0;
     conns:Array<Pos>=[];
+    connNodes:Array<Pos>=[];
     markerFrame:number=0;
 
     lastPathSrc=new Pos();
@@ -52,6 +53,8 @@ export class Level extends UIBase implements MapAccessor {
     centerAni=new CenteringAnimation(()=>this.centerStep());
     centering=false;
     centerPos:Pos;
+
+    entities:Array<Entity>=[];
 
     constructor()
     {
@@ -85,6 +88,15 @@ export class Level extends UIBase implements MapAccessor {
         this.connMode=!this.connMode;
         if(this.connMode) {
             this.conns.push(this.player.pos.clone());
+            this.activeConn=0;
+        }
+        else {
+            for(let pos of this.connNodes) {
+                this.mapPGet(pos).entity.alive=false;
+                this.mapPGet(pos).entity=null;
+            }
+            this.connNodes=[];
+            this.conns=[];
         }
     }
     
@@ -117,7 +129,7 @@ export class Level extends UIBase implements MapAccessor {
     {
         this.player=player;
         this.player.pos=this.entrance.clone();
-        this.mapGet(this.player.pos.x, this.player.pos.y).setEntity(this.player);
+        this.mapPGet(this.player.pos).setEntity(this.player);
         this.centerPlayer();
     }
 
@@ -163,7 +175,13 @@ export class Level extends UIBase implements MapAccessor {
 
     onPlayerAction()
     {
-
+        let that=this;
+        this.entities=this.entities.filter(
+            function(ent) {
+                ent.onTurn(that);
+                return ent.alive;
+            }
+        )
     }
 
     interactWith(ent:Entity)
@@ -191,7 +209,7 @@ export class Level extends UIBase implements MapAccessor {
             let pos=this.conns[this.activeConn];
             let ti=this.mapGet(pos.x+dx,pos.y+dy);
             if(ti && ti.passable && !ti.entity) {
-                let pTi=this.mapGet(pos.x,pos.y);
+                let pTi=this.mapPGet(pos);
                 let frame=0;
                 if(pTi.entity instanceof ConnectionPiece) {
                     let c=<ConnectionPiece>pTi.entity;
@@ -203,7 +221,8 @@ export class Level extends UIBase implements MapAccessor {
                 ti.setEntity(cp);
                 pos.x+=dx;
                 pos.y+=dy;
-                this.onPlayerAction();
+                this.connNodes.push(pos.clone());
+                if((this.connNodes.length&1)==0)this.onPlayerAction();
                 if(this.isCloseToBorder(pos)) {
                     this.centerConn();
                 }
@@ -211,7 +230,7 @@ export class Level extends UIBase implements MapAccessor {
         }
         else {
             let ti=this.mapGet(this.player.pos.x+dx,this.player.pos.y+dy);
-             let oldTi=this.mapGet(this.player.pos.x, this.player.pos.y);
+             let oldTi=this.mapPGet(this.player.pos);
             if(ti && ti.passable && oldTi.conn[dir]) {
                 if(ti.entity && this.interactWith(ti.entity)) {
                     return;
@@ -231,30 +250,26 @@ export class Level extends UIBase implements MapAccessor {
 
     addEntity(pos:Pos, entity:Entity)
     {
+        if(this.mapGet(pos.x, pos.y).entity) {
+            return false;
+        }
+        
         this.mapGet(pos.x, pos.y).setEntity(entity);
+        this.entities.push(entity);
+
+        return true;
     }
     mapClear(pos:Pos)
     {
         let xy=pos.x+'x'+pos.y;
         delete this.map[xy];
     }
-    mapSet(x:number, y:number, tile:TileBase)
-    mapSet(pos:Pos, tile:TileBase);
-    mapSet(posOrX:Pos|number, tileOrY:TileBase|number,maybeTile?:TileBase)
+    mapPSet(pos:Pos, tile:TileBase)
     {
-        let x:number;
-        let y:number;
-        let tile:TileBase;
-        if(posOrX instanceof Pos) {
-            x=posOrX.x;
-            y=posOrX.y;
-            tile=<TileBase>tileOrY;
-        }
-        else {
-            x=posOrX;
-            y=<number>tileOrY;
-            tile=maybeTile;
-        }
+        return this.mapSet(pos.x, pos.y, tile);
+    }
+    mapSet(x:number, y:number, tile:TileBase)
+    {
         let xy=x+'x'+y;
         let rv=new TileInfo(tile);
         rv.pos=new Pos(x,y);
@@ -293,6 +308,13 @@ export class Level extends UIBase implements MapAccessor {
         let xy=x+'x'+y;
         return this.map[xy];
     }
+    
+    mapPGet(pos:Pos)
+    {
+        let xy=pos.x+'x'+pos.y;
+        return this.map[xy];
+    }
+
     mapToScreen(pos:Pos)
     {
         return pos.clone().mul(tileSize).sub(this.offset);
@@ -361,7 +383,7 @@ export class Level extends UIBase implements MapAccessor {
         if(this.lastPathPos.isEqual(this.mouseMapPos)) {
             return;
         }
-        if(!this.mapGet(this.mouseMapPos.x, this.mouseMapPos.y)) {
+        if(!this.mapPGet(this.mouseMapPos)) {
             return;
         }
         this.resetLastPath();

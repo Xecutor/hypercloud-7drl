@@ -23,3 +23,15 @@ export class SecurityAnalyzer implements Program{
     }
 }
 
+export class BruteForce implements Program {
+    cpuCost=1;
+    memCost=4;
+    dmg=30;
+    name="Brute force attack";
+    descr=`Reduces integrity of malicious target on contact by ${this.dmg}.`;
+    isBackground=true;
+    backgroundStep()
+    {
+
+    }
+}

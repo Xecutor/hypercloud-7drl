@@ -93,6 +93,10 @@ export class Pos{
     {
         return Math.sqrt(this.x*this.x+this.y*this.y);
     }
+    makeRectAround(dist:number)
+    {
+        return new Rect(this.x-dist, this.y-dist, dist*2, dist*2);
+    }
 }
 
 export class Size{

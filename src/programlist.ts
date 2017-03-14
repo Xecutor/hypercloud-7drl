@@ -9,7 +9,7 @@ import * as gr from './graphics';
 
 let table=[
     {label:'Name', width: 300},
-    {label:'Type', width: 100},
+    {label:'Type', width: 200},
     {label:'CPU', width: 50},
     {label:'Mem', width: 50},
 ]
@@ -18,6 +18,7 @@ let table=[
 class ProgramItem extends UIContainer {
     program:Program;
     descrLabel:Label;
+    mouseOver=false;
     constructor(pos:Pos, program:Program,descrLabel:Label)
     {
         super();
@@ -53,11 +54,13 @@ class ProgramItem extends UIContainer {
     {
         super.onMouseEnter(e);
         this.descrLabel.label=this.program.descr;
+        this.mouseOver=true;
     }
     onMouseLeave(e:MyMouseEvent)
     {
         super.onMouseLeave(e);
         this.descrLabel.label='';
+        this.mouseOver=false;
     }
     loadProgram()
     {
@@ -66,6 +69,13 @@ class ProgramItem extends UIContainer {
     executeProgram()
     {
         
+    }
+    draw()
+    {
+        if(this.mouseOver) {
+            gr.fillrect(this.rect, '#252525');
+        }
+        super.draw();
     }
 }
 

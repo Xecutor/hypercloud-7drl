@@ -1,9 +1,9 @@
-import { Program, SecurityAnalyzer } from './programs';
+import { Program, SecurityAnalyzer, BruteForce } from './programs';
 import { Resource, RES } from './resources';
-import { Entity } from './entity';
+import { Entity, EntityFraction } from './entity';
 
 export class Player extends Entity {
-    isMalicious=false;
+    fraction=EntityFraction.system;
     resources:Array<Resource>=[
         new Resource('CPU', 'red'),
         new Resource('RAM', 'green'),
@@ -12,7 +12,7 @@ export class Player extends Entity {
         new Resource('INT', 'gold'),
     ];
     
-    programs:Array<Program>=[new SecurityAnalyzer, new SecurityAnalyzer];
+    programs:Array<Program>=[new SecurityAnalyzer, new BruteForce];
 
     constructor()
     {

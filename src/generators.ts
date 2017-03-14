@@ -11,8 +11,9 @@ export interface MapAccessor{
     mapRect:Rect;
     mouseMapPos:Pos;
     mapGet(x:number, y:number):TileInfo;
+    mapPGet(pos:Pos):TileInfo;
     mapSet(x:number, y:number, tile:TileBase):TileInfo;
-    mapSet(pos:Pos, tile:TileBase):TileInfo;
+    mapPSet(pos:Pos, tile:TileBase):TileInfo;
     mapClear(pos:Pos);
     setEntrance(pos:Pos);
     addEntity(pos:Pos, entity:Entity);
@@ -67,7 +68,7 @@ export class TestGenerator implements LevelGenerator {
     {
         let m =this.m;
         for(let it=m.mapRect.getIterator();it.next();) {
-            let ti=m.mapGet(it.value.x, it.value.y);
+            let ti=m.mapPGet(it.value);
             if(!ti || !(ti.tile instanceof WallTile))continue;
             for(let i=0;i<4;++i) {
                 let n=m.mapGet(it.value.x+dirX[i], it.value.y+dirY[i]);
@@ -81,7 +82,7 @@ export class TestGenerator implements LevelGenerator {
     fillRect(r:Rect)
     {
         for(let it=r.getIterator();it.next();) {
-            this.m.mapSet(it.value, null);
+            this.m.mapPSet(it.value, null);
         }
     }
 
@@ -92,7 +93,7 @@ export class TestGenerator implements LevelGenerator {
         let dy=[-1,-1,0,1,1,1,0,-1];
 
         for(let it=m.mapRect.getIterator();it.next();) {
-            let ti=m.mapGet(it.value.x, it.value.y);
+            let ti=m.mapPGet(it.value);
             if(!ti || ti.tile){
                 continue;
             }
@@ -115,7 +116,7 @@ export class TestGenerator implements LevelGenerator {
         let dy=[-1,-1,0,1,1,1,0,-1];
 
         for(let it=m.mapRect.getIterator();it.next();) {
-            let ti=m.mapGet(it.value.x, it.value.y);
+            let ti=m.mapPGet(it.value);
             if(ti && !ti.tile) {
                 m.mapClear(it.value);
             }
@@ -238,7 +239,7 @@ export class TestGenerator implements LevelGenerator {
             let arr=[DataBoxTile, DataProcessorTile];
             let cls=randomFromArray(arr);
             let t=new cls();
-            m.mapSet(pos, t);
+            m.mapPSet(pos, t);
         }
 
         for(let i=0;i<poi.length;++i) {
@@ -263,7 +264,7 @@ export class TestGenerator implements LevelGenerator {
                 }
             }while(!goodWall);
 
-            (<WallTile>m.mapGet(wp.x, wp.y).tile).connector=true;
+            (<WallTile>m.mapPGet(wp).tile).connector=true;
             for(let j=0;j<3;++j) {
                 let p = randomFromArray(poi);
 
@@ -291,11 +292,11 @@ export class TestGenerator implements LevelGenerator {
             pos=randomFromArray(this.corridors);
             let enemies=[Spyware, Muncher];
             let cls=randomFromArray(enemies);
-            m.mapGet(pos.x,pos.y).setEntity(new cls);
+            m.addEntity(pos,new cls);
         }
 
         for(let it=m.mapRect.getIterator();it.next();) {
-            let ti=m.mapGet(it.value.x, it.value.y);
+            let ti=m.mapPGet(it.value);
             if(ti && ti.tile) {
                 ti.update();
             }
