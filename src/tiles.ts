@@ -114,6 +114,8 @@ export class TileInfo{
     tile:TileBase;
     entity:Entity;
     passable:boolean;
+    floodValue:number;
+    floodSeq:number;
     conn=[false,false,false,false]
     constructor(tile:TileBase)
     {

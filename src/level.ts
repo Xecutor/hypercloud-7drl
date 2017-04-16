@@ -56,6 +56,9 @@ export class Level extends UIBase implements MapAccessor {
 
     entities:Array<Entity>=[];
 
+    floodSeq=0;
+    showFlood=false;
+
     constructor()
     {
         super();
@@ -70,6 +73,8 @@ export class Level extends UIBase implements MapAccessor {
             this.bindings.bind(moveKeys[i], ()=>this.move(i));
         }
         this.bindings.bind('q',()=>this.toggleDebugTiles());
+        this.bindings.bind('f',()=>this.showFlood=!this.showFlood);
+
         this.bindings.bind('c', ()=>this.toggleConnMode());
         this.bindings.bind('tab', ()=>this.switchConn());
         this.bindings.bind('b', ()=>this.branchConn());
@@ -348,6 +353,10 @@ export class Level extends UIBase implements MapAccessor {
                         let en=ti.entity;
                         TileManager.instance.drawTile(pos, en.tileName, en.tileFrame);
                     }
+                    if(this.showFlood && ti.floodSeq==this.floodSeq) {
+                        gr.setFontSize(8);
+                        gr.textout(pos.x, pos.y, 'white', ti.floodValue.toString());
+                    }
                 }
                 if(x0+x==this.mouseMapPos.x && y0+y==this.mouseMapPos.y) {
                     TileManager.instance.drawTile(pos, 'tile-highlight',0);
@@ -474,6 +483,33 @@ export class Level extends UIBase implements MapAccessor {
             this.move(dir);
             this.lastPathPos.assign(src);
             this.updatePath();
+        }
+    }
+    floodMap(from:Array<Pos>, maxDist:number=-1)
+    {
+        let dist = 0;
+        let next:Array<Pos>=[];
+        let pos=new Pos;
+        ++this.floodSeq;
+        while(from.length) {
+            for(let pos0 of from) {
+                let ti0=this.mapPGet(pos0);
+                console.log(`check ${ti0} at ${pos0.x},${pos0.y}`);
+                ti0.floodSeq=this.floodSeq;
+                ti0.floodValue=dist;
+                for(let i=0;i<4;++i) {
+                    let x1=pos0.x+dirX[i];
+                    let y1=pos0.y+dirY[i];
+                    let ti=this.mapGet(x1, y1);
+                    if(!ti || !ti.passable || ti.floodSeq==this.floodSeq || 
+                       !ti0.conn[diffToDir(pos0.x, pos0.y, x1,y1)])continue;
+                    next.push(new Pos(x1,y1));
+                }
+            }
+            ++dist;
+            from=next;
+            next=[];
+            if(maxDist!=-1 && dist>maxDist)break;
         }
     }
 }

@@ -10,6 +10,7 @@ import ROT from './rotwrap';
 export interface MapAccessor{
     mapRect:Rect;
     mouseMapPos:Pos;
+    floodSeq:number;
     mapGet(x:number, y:number):TileInfo;
     mapPGet(pos:Pos):TileInfo;
     mapSet(x:number, y:number, tile:TileBase):TileInfo;
@@ -17,6 +18,7 @@ export interface MapAccessor{
     mapClear(pos:Pos);
     setEntrance(pos:Pos);
     addEntity(pos:Pos, entity:Entity);
+    floodMap(from:Array<Pos>, maxDist:number);
 }
 
 export interface LevelGenerator{

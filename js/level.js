@@ -31,6 +31,8 @@ define(["require", "exports", "./programlist", "uimanager", "./connection", "./t
             this.centerAni = new CenteringAnimation(() => this.centerStep());
             this.centering = false;
             this.entities = [];
+            this.floodSeq = 0;
+            this.showFlood = false;
             let sz = gr.getAppSize();
             this.rect = new utils_1.Rect(0, 0, sz.width - hud_1.hudWIdth, sz.height);
         }
@@ -40,6 +42,7 @@ define(["require", "exports", "./programlist", "uimanager", "./connection", "./t
                 this.bindings.bind(moveKeys[i], () => this.move(i));
             }
             this.bindings.bind('q', () => this.toggleDebugTiles());
+            this.bindings.bind('f', () => this.showFlood = !this.showFlood);
             this.bindings.bind('c', () => this.toggleConnMode());
             this.bindings.bind('tab', () => this.switchConn());
             this.bindings.bind('b', () => this.branchConn());
@@ -273,6 +276,10 @@ define(["require", "exports", "./programlist", "uimanager", "./connection", "./t
                             let en = ti.entity;
                             tilemanager_1.TileManager.instance.drawTile(pos, en.tileName, en.tileFrame);
                         }
+                        if (this.showFlood && ti.floodSeq == this.floodSeq) {
+                            gr.setFontSize(8);
+                            gr.textout(pos.x, pos.y, 'white', ti.floodValue.toString());
+                        }
                     }
                     if (x0 + x == this.mouseMapPos.x && y0 + y == this.mouseMapPos.y) {
                         tilemanager_1.TileManager.instance.drawTile(pos, 'tile-highlight', 0);
@@ -381,6 +388,34 @@ define(["require", "exports", "./programlist", "uimanager", "./connection", "./t
                 this.move(dir);
                 this.lastPathPos.assign(src);
                 this.updatePath();
+            }
+        }
+        floodMap(from, maxDist = -1) {
+            let dist = 0;
+            let next = [];
+            let pos = new utils_1.Pos;
+            ++this.floodSeq;
+            while (from.length) {
+                for (let pos0 of from) {
+                    let ti0 = this.mapPGet(pos0);
+                    console.log(`check ${ti0} at ${pos0.x},${pos0.y}`);
+                    ti0.floodSeq = this.floodSeq;
+                    ti0.floodValue = dist;
+                    for (let i = 0; i < 4; ++i) {
+                        let x1 = pos0.x + tiles_1.dirX[i];
+                        let y1 = pos0.y + tiles_1.dirY[i];
+                        let ti = this.mapGet(x1, y1);
+                        if (!ti || !ti.passable || ti.floodSeq == this.floodSeq ||
+                            !ti0.conn[tiles_1.diffToDir(pos0.x, pos0.y, x1, y1)])
+                            continue;
+                        next.push(new utils_1.Pos(x1, y1));
+                    }
+                }
+                ++dist;
+                from = next;
+                next = [];
+                if (maxDist != -1 && dist > maxDist)
+                    break;
             }
         }
     }
